@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: buildverse-backend
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PROJECT_NAME
+        value: "BuildVerse AI"
+      - key: TAGLINE
+        value: "Design. Visualize. Build. Experience."
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: "HS256"
+      - key: DATABASE_URL
+        value: "sqlite+aiosqlite:///./buildverse.db"
+      - key: ALLOWED_ORIGINS
+        value: "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,https://your-vercel-app.vercel.app"

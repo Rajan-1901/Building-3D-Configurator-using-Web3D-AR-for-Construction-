@@ -1,8 +1,10 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-import uvicorn
+import os
 import logging
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Response, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 from app.core.config import settings
 from app.core.database import engine, Base
@@ -53,9 +55,13 @@ async def root():
         "docs": "/docs"
     }
 
+@app.head("/")
+async def root_head():
+    return Response(status_code=200)
+
 @app.get("/health")
 async def health():
-    return {"status": "HEALTHY", "services": ["database", "ai_engine", "digital_twin_ws", "cost_engine"]}
+    return {"status": "ok"}
 
 @app.websocket("/ws/{project_id}")
 async def websocket_endpoint(websocket: WebSocket, project_id: str):
@@ -72,4 +78,5 @@ async def websocket_endpoint(websocket: WebSocket, project_id: str):
         manager.disconnect(websocket, project_id)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
